@@ -19,10 +19,10 @@ class ClassUtil {
             name = name.replace('.', '/')
 
             val url = ClassUtil::class.java.getResource(name)
-            val directory = File(url.file)
+            val directory = if(url == null) null else File(url.file)
 
             var classList = ArrayList<KClass<out Any>>()
-            if (directory.exists()) {
+            if (directory?.exists() == true) {
                 directory.walk()
                     .filter { it.isFile && !it.name.contains('$') && it.name.endsWith(".class") }
                     .forEach {
