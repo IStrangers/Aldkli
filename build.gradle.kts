@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.1.2"
     id("io.spring.dependency-management") version "1.1.2"
-    kotlin("jvm") version "1.8.22"
-    kotlin("plugin.spring") version "1.8.22"
+    kotlin("jvm") version "1.9.0"
+    kotlin("plugin.spring") version "1.9.0"
 }
 
 group = "com.msw"
@@ -15,10 +15,12 @@ java {
 }
 
 repositories {
+    maven{ setUrl("https://maven.aliyun.com/nexus/content/groups/public/") }
     mavenCentral()
 }
 
 dependencies {
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.39")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
