@@ -1,8 +1,8 @@
-import com.alibaba.fastjson2.JSON
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.msw.aldkli.scanner.ApiScanner
 
 fun main(args: Array<String>) {
     val scanPackage = "com.aix.controller"
     val apiGroupMetaDataList = ApiScanner().scan(scanPackage)
-    println(JSON.toJSONString(apiGroupMetaDataList))
+    println(ObjectMapper().writeValueAsString(apiGroupMetaDataList))
 }

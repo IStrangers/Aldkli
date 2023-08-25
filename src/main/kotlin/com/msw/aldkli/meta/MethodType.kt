@@ -1,12 +1,12 @@
 package com.msw.aldkli.meta
 
-enum class MethodType(val value: String) {
+enum class MethodType {
 
-    ALL("GET,POST,PUT,DELETE,PATCH"),
-    GET("GET"),
-    POST("POST"),
-    PUT("PUT"),
-    DELETE("DELETE"),
-    PATCH("PATCH"),
+    ALL,
+    GET,
+    POST,
+    PUT,
+    DELETE,
+    PATCH;
 
 }

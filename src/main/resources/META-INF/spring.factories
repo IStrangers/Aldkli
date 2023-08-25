@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.msw.springboot.config.AldkliConfiguration
+com.msw.aldkli.AldkliAutoConfiguration
