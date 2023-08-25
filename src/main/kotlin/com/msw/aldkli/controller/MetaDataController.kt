@@ -1,9 +1,8 @@
 package com.msw.aldkli.controller
 
-import com.msw.aldkli.meta.ApiGroupMetaData
-import com.msw.aldkli.scanner.ApiScanner
+import com.msw.aldkli.meta.ApiEntry
+import com.msw.aldkli.service.MetaDataService
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -11,7 +10,13 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("aldkli/metaData")
 class MetaDataController {
 
-    @GetMapping("getApiGroupMetaDataList/{scanPackage}")
-    fun getApiGroupMetaDataList(@PathVariable scanPackage: String): List<ApiGroupMetaData> = ApiScanner().scan(scanPackage)
+    constructor(metaDataService: MetaDataService) {
+        this.metaDataService = metaDataService
+    }
+
+    private var metaDataService: MetaDataService
+
+    @GetMapping("getApiEntryList")
+    fun getApiEntryList(): List<ApiEntry> = metaDataService.getApiEntryList()
 
 }
