@@ -23,6 +23,7 @@ import java.util.*
 import java.util.function.Function
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class ApiScanner {
 
@@ -75,7 +76,7 @@ class ApiScanner {
 
     private fun getParameters(declaredMethod: Method): List<ApiParam>? {
         var apiParamList = ArrayList<ApiParam>()
-        val apiParams = declaredMethod.getDeclaredAnnotation(ApiParams::class.java)
+        val apiParams: ApiParams? = declaredMethod.getDeclaredAnnotation(ApiParams::class.java)
         val parameters = declaredMethod.parameters
         if (apiParams == null) {
             for (parameter in parameters) {
@@ -92,16 +93,11 @@ class ApiScanner {
     }
 
     private fun toApiParam(apiParam: com.msw.aldkli.annotation.ApiParam?, parameter: Parameter?): ApiParam {
-        if (apiParam == null) {
-            if (parameter == null) throw RuntimeException("resolve ApiParam error: parameter is null")
-            val (required,type) = getRequiredAndType(parameter)
-            val dataType = parameter.type.simpleName
-            return ApiParam(parameter.name,required,"",type,dataType)
-        } else {
-            val (required,type) = getRequiredAndType(parameter)
-            val dataType = if(parameter != null) parameter.type.simpleName else ""
-            return ApiParam(apiParam.param,required,apiParam.description,type,dataType)
-        }
+        val name = apiParam?.param ?: parameter?.name ?: ""
+        val (required,type) = getRequiredAndType(parameter)
+        val description = apiParam?.description ?: ""
+        val dataType = parameter?.type?.simpleName ?: ""
+        return ApiParam(name,required,description,type,dataType)
     }
 
     private fun getRequiredAndType(parameter: Parameter?): Pair<Boolean,String> {
