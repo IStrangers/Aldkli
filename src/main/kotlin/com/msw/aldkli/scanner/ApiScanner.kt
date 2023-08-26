@@ -95,10 +95,12 @@ class ApiScanner {
         if (apiParam == null) {
             if (parameter == null) throw RuntimeException("resolve ApiParam error: parameter is null")
             val (required,type) = getRequiredAndType(parameter)
-            return ApiParam(parameter.name,required,"",type)
+            val dataType = parameter.type.simpleName
+            return ApiParam(parameter.name,required,"",type,dataType)
         } else {
             val (required,type) = getRequiredAndType(parameter)
-            return ApiParam(apiParam.param,required,apiParam.description,type)
+            val dataType = if(parameter != null) parameter.type.simpleName else ""
+            return ApiParam(apiParam.param,required,apiParam.description,type,dataType)
         }
     }
 
