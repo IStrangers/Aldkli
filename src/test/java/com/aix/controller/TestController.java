@@ -1,10 +1,7 @@
 package com.aix.controller;
 
 import com.aix.entity.User;
-import com.msw.aldkli.annotation.Api;
-import com.msw.aldkli.annotation.ApiGroup;
-import com.msw.aldkli.annotation.ApiParam;
-import com.msw.aldkli.annotation.ApiParams;
+import com.msw.aldkli.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +20,14 @@ public class TestController {
     @ApiParams({
         @ApiParam(param = "param1",description = "参数1",example = "test"),
         @ApiParam(param = "param2",example = "1"),
+    })
+    @ApiReturnType(name = "Result",description = "测试列表",dataType = "List<Map<String, Object>>",children = {
+        @ApiReturnType(name = "testName",description = "测试名称",dataType = "String"),
+        @ApiReturnType(name = "testCode",description = "测试编码",dataType = "String"),
+        @ApiReturnType(name = "testMap",description = "测试映射",dataType = "Map<String, Object>",children = {
+            @ApiReturnType(name = "mappingName",description = "映射名称",dataType = "String"),
+            @ApiReturnType(name = "mappingCode",description = "映射编码",dataType = "String")
+        })
     })
     public List<Map<String, Object>> getTestList(@RequestParam(required = false) String param1, @PathVariable int param2) {
         return new ArrayList<>();

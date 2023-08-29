@@ -111,10 +111,19 @@ class ApiScanner {
     }
 
     private fun getReturnType(declaredMethod: Method): ApiReturnTypeMetaData {
-        val genericReturnType = declaredMethod.genericReturnType
-        val dataType = ClassUtil.getGenericTypeName(genericReturnType)
-        val (apiEntry,children) = resolveApiEntity(genericReturnType);
-        return ApiReturnTypeMetaData("Result",apiEntry?.value ?: "",dataType,children)
+        val apiReturnType = declaredMethod.getDeclaredAnnotation(ApiReturnType::class.java)
+        if (apiReturnType != null) {
+            return convertToApiReturnTypeMetaData(apiReturnType)
+        } else {
+            val genericReturnType = declaredMethod.genericReturnType
+            val dataType = ClassUtil.getGenericTypeName(genericReturnType)
+            val (apiEntry,children) = resolveApiEntity(genericReturnType);
+            return ApiReturnTypeMetaData("Result",apiEntry?.value ?: "",dataType,children)
+        }
+    }
+
+    private fun convertToApiReturnTypeMetaData(apiReturnType: ApiReturnType): ApiReturnTypeMetaData {
+        return ApiReturnTypeMetaData(apiReturnType.name,apiReturnType.description,apiReturnType.dataType,apiReturnType.children.map { convertToApiReturnTypeMetaData(it) })
     }
 
     private fun resolveApiEntity(genericType: Type): Pair<ApiEntity?,List<ApiReturnTypeMetaData>?> {
