@@ -2,11 +2,9 @@ package com.msw.aldkli.scanner
 
 import com.msw.aldkli.annotation.Api
 import com.msw.aldkli.annotation.ApiGroup
+import com.msw.aldkli.annotation.ApiParam
 import com.msw.aldkli.annotation.ApiParams
-import com.msw.aldkli.meta.ApiGroupMetaData
-import com.msw.aldkli.meta.ApiMetaData
-import com.msw.aldkli.meta.ApiParam
-import com.msw.aldkli.meta.MethodType
+import com.msw.aldkli.meta.*
 import com.msw.aldkli.util.ClassUtil
 
 import java.lang.reflect.Method
@@ -23,7 +21,6 @@ import java.util.*
 import java.util.function.Function
 import java.util.stream.Collectors
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class ApiScanner {
 
@@ -42,8 +39,9 @@ class ApiScanner {
             for (declaredMethod in declaredMethods) {
                 val api = declaredMethod.getDeclaredAnnotation(Api::class.java) ?: continue
                 val (methodType,pathList) = getMethodAndPathList(declaredMethod) ?: continue
-                val apiParamList = getParameters(declaredMethod)
-                apiMetaDataList.add(ApiMetaData(api.value,methodType,pathList,apiParamList))
+                val apiParamMetaDataList = getParameters(declaredMethod)
+                val apiReturnTypeMetaData = getReturnType(declaredMethod)
+                apiMetaDataList.add(ApiMetaData(api.value,methodType,pathList,apiParamMetaDataList,apiReturnTypeMetaData))
             }
             apiGroupMetaDataList.add(ApiGroupMetaData(apiGroup.value,requestMapping?.value,apiMetaDataList))
         }
@@ -74,30 +72,31 @@ class ApiScanner {
         return null
     }
 
-    private fun getParameters(declaredMethod: Method): List<ApiParam>? {
-        var apiParamList = ArrayList<ApiParam>()
+    private fun getParameters(declaredMethod: Method): List<ApiParamMetaData>? {
+        var apiParamMetaDataList = ArrayList<ApiParamMetaData>()
         val apiParams: ApiParams? = declaredMethod.getDeclaredAnnotation(ApiParams::class.java)
         val parameters = declaredMethod.parameters
         if (apiParams == null) {
             for (parameter in parameters) {
-                apiParamList.add(toApiParam(null,parameter))
+                apiParamMetaDataList.add(toApiParam(null,parameter))
             }
         } else {
             val parameterMap = Arrays.stream(parameters).collect(Collectors.toMap(Parameter::getName, Function.identity()))
             for (apiParam in apiParams.value) {
                 val parameter = parameterMap[apiParam.param]
-                apiParamList.add(toApiParam(apiParam,parameter))
+                apiParamMetaDataList.add(toApiParam(apiParam,parameter))
             }
         }
-        return apiParamList
+        return apiParamMetaDataList
     }
 
-    private fun toApiParam(apiParam: com.msw.aldkli.annotation.ApiParam?, parameter: Parameter?): ApiParam {
+    private fun toApiParam(apiParam: ApiParam?, parameter: Parameter?): ApiParamMetaData {
         val name = apiParam?.param ?: parameter?.name ?: ""
         val (required,type) = getRequiredAndType(parameter)
         val description = apiParam?.description ?: ""
-        val dataType = parameter?.type?.simpleName ?: ""
-        return ApiParam(name,required,description,type,dataType)
+        val dataType = if(parameter != null) ClassUtil.getGenericTypeName(parameter.parameterizedType) else ""
+        val example = apiParam?.example ?: ""
+        return ApiParamMetaData(name,required,description,type,dataType,example)
     }
 
     private fun getRequiredAndType(parameter: Parameter?): Pair<Boolean,String> {
@@ -110,6 +109,11 @@ class ApiScanner {
             return Pair(pathVariable.required,"urlPath")
         }
         return Pair(false,"")
+    }
+
+    private fun getReturnType(declaredMethod: Method): ApiReturnTypeMetaData {
+        val genericReturnType = declaredMethod.genericReturnType
+        return ApiReturnTypeMetaData("Result",ClassUtil.getGenericTypeName(genericReturnType))
     }
 
 }

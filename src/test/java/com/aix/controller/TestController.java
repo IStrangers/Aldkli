@@ -20,8 +20,8 @@ public class TestController {
     @Api("获取测试列表")
     @RequestMapping({"getTestList","TestList"})
     @ApiParams({
-        @ApiParam(param = "param1",description = "参数1"),
-        @ApiParam(param = "param2"),
+        @ApiParam(param = "param1",description = "参数1",example = "test"),
+        @ApiParam(param = "param2",example = "1"),
     })
     public List<Map<String, Object>> getTestList(@RequestParam(required = false) String param1, @PathVariable int param2) {
         return new ArrayList<>();
@@ -29,7 +29,7 @@ public class TestController {
 
     @Api("getMapping")
     @GetMapping("getMapping")
-    public Object getMapping() {
+    public Object getMapping(Map<String,Long> data) {
         return new ArrayList<>();
     }
 

@@ -1,6 +1,8 @@
 package com.msw.aldkli.util;
 
 import java.io.File
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
 class ClassUtil {
@@ -34,6 +36,24 @@ class ClassUtil {
             }
             return classList
         }
+
+        fun getGenericTypeName(genericType: Type): String {
+            val typeName = StringBuilder()
+            if (genericType is ParameterizedType) {
+                val rawType = genericType.rawType
+                typeName.append(if(rawType is Class<*>) rawType.simpleName else rawType.typeName)
+                val actualTypeArguments = genericType.actualTypeArguments
+                if (actualTypeArguments.isNotEmpty()) {
+                    typeName.append("<")
+                    typeName.append(actualTypeArguments.joinToString(",") { getGenericTypeName(it) })
+                    typeName.append(">")
+                }
+            } else {
+                typeName.append(if(genericType is Class<*>) genericType.simpleName else genericType.typeName)
+            }
+            return typeName.toString();
+        }
+
     }
 
 }
