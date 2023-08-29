@@ -1,5 +1,6 @@
 package com.aix.controller;
 
+import com.aix.entity.User;
 import com.msw.aldkli.annotation.Api;
 import com.msw.aldkli.annotation.ApiGroup;
 import com.msw.aldkli.annotation.ApiParam;
@@ -27,10 +28,16 @@ public class TestController {
         return new ArrayList<>();
     }
 
-    @Api("getMapping")
-    @GetMapping("getMapping")
-    public Object getMapping(Map<String,Long> data) {
+    @Api("获取用户列表")
+    @GetMapping("getUserList")
+    public List<User> getUserList(Map<String,Long> data) {
         return new ArrayList<>();
+    }
+
+    @Api("获取用户")
+    @GetMapping("getUser")
+    public User getUser() {
+        return new User();
     }
 
 }

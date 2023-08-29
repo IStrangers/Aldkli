@@ -1,9 +1,6 @@
 package com.msw.aldkli.scanner
 
-import com.msw.aldkli.annotation.Api
-import com.msw.aldkli.annotation.ApiGroup
-import com.msw.aldkli.annotation.ApiParam
-import com.msw.aldkli.annotation.ApiParams
+import com.msw.aldkli.annotation.*
 import com.msw.aldkli.meta.*
 import com.msw.aldkli.util.ClassUtil
 
@@ -17,6 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import java.lang.reflect.Parameter
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 import java.util.*
 import java.util.function.Function
 import java.util.stream.Collectors
@@ -113,7 +112,28 @@ class ApiScanner {
 
     private fun getReturnType(declaredMethod: Method): ApiReturnTypeMetaData {
         val genericReturnType = declaredMethod.genericReturnType
-        return ApiReturnTypeMetaData("Result",ClassUtil.getGenericTypeName(genericReturnType))
+        val dataType = ClassUtil.getGenericTypeName(genericReturnType)
+        val (apiEntry,children) = resolveApiEntity(genericReturnType);
+        return ApiReturnTypeMetaData("Result",apiEntry?.value ?: "",dataType,children)
+    }
+
+    private fun resolveApiEntity(genericType: Type): Pair<ApiEntity?,List<ApiReturnTypeMetaData>?> {
+        var apiEntryClass: Class<*> = getApiEntityClass(genericType) ?: return Pair(null,null)
+        val apiEntry = apiEntryClass.getDeclaredAnnotation(ApiEntity::class.java) ?: return Pair(null,null)
+        val declaredFields = apiEntryClass.declaredFields
+        val children = ArrayList<ApiReturnTypeMetaData>(declaredFields.size)
+        for (declaredField in declaredFields) {
+            val apiProperty = declaredField.getDeclaredAnnotation(ApiProperty::class.java) ?: continue
+            val dataType = ClassUtil.getGenericTypeName(declaredField.genericType)
+            children.add(ApiReturnTypeMetaData(declaredField.name,apiProperty.value,dataType,resolveApiEntity(declaredField.genericType).second))
+        }
+        return Pair(apiEntry,children)
+    }
+
+    private fun getApiEntityClass(genericType: Type): Class<*>? {
+        var apiEntryClass = if (genericType is ParameterizedType) genericType.actualTypeArguments[0] else genericType
+        if (apiEntryClass !is Class<*>) return null
+        return apiEntryClass
     }
 
 }
