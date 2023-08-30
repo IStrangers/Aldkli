@@ -21,10 +21,10 @@ public class TestController {
         @ApiParam(param = "param1",description = "参数1",example = "test"),
         @ApiParam(param = "param2",example = "1"),
     })
-    @ApiReturnType(name = "Result",description = "测试列表",dataType = "List<Map<String, Object>>",children = {
+    @ApiReturnType(name = "Result",description = "测试列表",dataType = "List<Map<String,Object>>",children = {
         @ApiReturnType(name = "testName",description = "测试名称",dataType = "String"),
         @ApiReturnType(name = "testCode",description = "测试编码",dataType = "String"),
-        @ApiReturnType(name = "testMap",description = "测试映射",dataType = "Map<String, Object>",children = {
+        @ApiReturnType(name = "testMap",description = "测试映射",dataType = "Map<String,Object>",children = {
             @ApiReturnType(name = "mappingName",description = "映射名称",dataType = "String"),
             @ApiReturnType(name = "mappingCode",description = "映射编码",dataType = "String")
         })

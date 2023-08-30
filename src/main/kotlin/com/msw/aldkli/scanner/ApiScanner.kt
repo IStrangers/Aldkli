@@ -126,9 +126,9 @@ class ApiScanner {
         return ApiReturnTypeMetaData(apiReturnType.name,apiReturnType.description,apiReturnType.dataType,apiReturnType.children.map { convertToApiReturnTypeMetaData(it) })
     }
 
-    private fun resolveApiEntity(genericType: Type): Pair<ApiEntity?,List<ApiReturnTypeMetaData>?> {
-        var apiEntryClass: Class<*> = getApiEntityClass(genericType) ?: return Pair(null,null)
-        val apiEntry = apiEntryClass.getDeclaredAnnotation(ApiEntity::class.java) ?: return Pair(null,null)
+    private fun resolveApiEntity(genericType: Type): Pair<ApiEntity?,List<ApiReturnTypeMetaData>> {
+        var apiEntryClass: Class<*> = getApiEntityClass(genericType) ?: return Pair(null,ArrayList(0))
+        val apiEntry = apiEntryClass.getDeclaredAnnotation(ApiEntity::class.java) ?: return Pair(null,ArrayList(0))
         val declaredFields = apiEntryClass.declaredFields
         val children = ArrayList<ApiReturnTypeMetaData>(declaredFields.size)
         for (declaredField in declaredFields) {
